@@ -12,11 +12,11 @@
     <resultMap id="UserEntityMap" type="com.cy.store.entity.User">
         <!--将表的字段和类的属性不一样的字段进行匹配指定-->
         <!--完成名称不一致的一一映射，原因在于JAVA和sql的命名规范不一致-->
-        <result column="is_delete" property="isDelete"></result>
-        <result column="created_user" property="createdUser"></result>
-        <result column="created_time" property="createdTime"></result>
-        <result column="modified_user" property="modifiedUser"></result>
-        <result column="modified_time" property="modifiedTime"></result>
+        <result column="is_delete" property="isDelete"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="modified_user" property="modifiedUser"/>
+        <result column="modified_time" property="modifiedTime"/>
     </resultMap>
 
     <!--id属性：表示映射接口中方法的名称，直接标签的内容部来编写SQL-->

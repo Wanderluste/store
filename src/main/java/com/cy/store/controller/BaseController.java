@@ -38,6 +38,12 @@ public class BaseController {
         }else if (e instanceof AccessDeniedException) {
             result.setState(4005);
             result.setMassage("收货数据地址非法访问");
+        }else if (e instanceof ProductNotFoundException) {
+            result.setState(4006);
+            result.setMassage("访问的商品数据不存在！");
+        }else if (e instanceof CartNotFoundException) {
+            result.setState(4007);
+            result.setMassage("购物车数据不存在！");
         } else if (e instanceof UpdateException) {
             result.setState(5003);
             result.setMassage("更新数据产生异常");

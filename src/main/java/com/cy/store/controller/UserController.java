@@ -46,8 +46,6 @@ public class UserController extends BaseController{
         session.setAttribute("uid", data.getUid());
         session.setAttribute("username", data.getUsername());
         //获取session中绑定的数据
-        System.out.println(getuidFromSession(session));
-        System.out.println(getUsernameFromSession(session));
         return new JsonResult<User>(OK, data);
     }
     @RequestMapping("change_password")

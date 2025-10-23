@@ -290,6 +290,41 @@
 			</div>
 		</footer>
 		<!--页脚结束-->
+		<script type="text/javascript">
+			$(document).ready(function () {
+				showAddressList();
+			})
+			function showAddressList() {
+				$("#hot-list").empty(); // 先清空容器（也可以在最后用html()一次性覆盖）
+				$.ajax({
+					url: "/products/hot_list",
+					type: "GET",
+					dataType: "JSON",
+					success: function (json) {
+						if (!json || !Array.isArray(json.data)) {
+							console.error("数据格式错误");
+							return;
+						}
+						let list = json.data;
+						let html = ''; // 先定义一个空字符串用于拼接所有HTML
+						for (let i = 0; i < list.length; i++) {
+							// 每次循环只拼接字符串，不操作DOM
+							let itemHtml = '<div class="col-md-12">'
+									+ '<div class="col-md-7 text-row-2"><a href="product.html?id=' + list[i].id + '">' + list[i].title + '</a></div>'
+									+ '<div class="col-md-2">¥' + list[i].price + '</div>'
+									+ '<div class="col-md-3"><img src="../' + list[i].image + 'collect.png" class="img-responsive"/></div>'
+									+ '</div>';
+							html += itemHtml; // 累加字符串
+						}
+						// 循环结束后，一次性将所有HTML插入DOM
+						$("#hot-list").html(html);
+					},
+					error: function(xhr, status, error) {
+						console.error("请求失败:", error);
+					}
+				})
+			}
+		</script>
 	</body>
 
 </html>
