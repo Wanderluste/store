@@ -47,18 +47,15 @@ public class AddressController extends BaseController{
         Address address = addressService.queryAddressByAid(aid);
         address.setCreatedUser(null);
         address.setModifiedUser(null);
-        address.setModifiedUser(null);
+        address.setModifiedTime(null);
         address.setCreatedTime(null);
         address.setIsDefault(0);
         return new JsonResult<>(OK, address);
     }
     @PostMapping("/updateAddress")
     public JsonResult<Void> updateAddress(Address address, HttpSession session){
-        String modifiedUser = getUsernameFromSession(session);
-        int res = addressService.updateOneAddress(address, modifiedUser);
-        if (res == 0) {
-            throw new InsertException("修改地址时，服务器或数据库异常");
-        }
+        String username = getUsernameFromSession(session);
+        addressService.updateOneAddress(address, username);
         return new JsonResult<>(OK);
     }
 }

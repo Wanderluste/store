@@ -129,7 +129,7 @@ public class AddressServiceImpl implements IAddressService {
     }
 
     @Override
-    public int updateOneAddress(Address address, String modifiedUser) {
+    public void updateOneAddress(Address address, String modifiedUser) {
         String provinceName = districtService.getNameByCode(address.getProvinceCode());
         String cityName = districtService.getNameByCode(address.getCityCode());
         String areaName = districtService.getNameByCode(address.getAreaCode());
@@ -142,9 +142,9 @@ public class AddressServiceImpl implements IAddressService {
         address.setModifiedUser(modifiedUser);
         address.setModifiedTime(new Date());
         int res = addressMapper.updateAddress(address);
+        System.out.println("Rows affected: " + res);
         if (res == 0) {
-            throw new UpdateException("修改地址失败，地址不存在或没有权限");
+            throw new UpdateException("更新失败！");
         }
-        return res;
     }
 }
