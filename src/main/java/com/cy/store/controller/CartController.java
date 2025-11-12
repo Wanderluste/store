@@ -6,10 +6,9 @@ import com.cy.store.util.JsonResult;
 import com.cy.store.vo.CartVO;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RequestMapping("carts")
@@ -38,4 +37,31 @@ public class CartController extends BaseController{
         Integer data = cartService.addNum(cid, getuidFromSession(session), getUsernameFromSession(session));
         return new JsonResult<>(OK, data);
     }
+    @RequestMapping("list")
+    public JsonResult<List<CartVO>> getVOByCid(Integer[] cids, HttpSession session) {
+        List<CartVO> data = cartService.getVOByCid(getuidFromSession(session), cids);
+        return new JsonResult<>(OK, data);
+    }
+    @PostMapping("/updateCart")
+    public JsonResult<Void> updateCartByCid(Integer num, Integer cid, HttpSession session) {
+        String username = getUsernameFromSession(session);
+        cartService.updateCartNumByCid(num, cid, username, new Date());
+        return new JsonResult<>(OK);
+    }
+
+    @PostMapping("/deleteCart")
+    public JsonResult<Void> deleteCartByCid(Integer[] cids) {
+        for (Integer cid : cids) {
+            cartService.deleteCartByCid(cid);
+        }
+        return new JsonResult<>(OK);
+    }
+    @GetMapping("/showCarts")
+    public JsonResult<List<CartVO>> showCarts(HttpSession session){
+        Integer uid = getuidFromSession(session);
+        List<CartVO> carts = cartService.getVOByUid(uid);
+
+        return new JsonResult<>(OK,carts);
+    }
+
 }

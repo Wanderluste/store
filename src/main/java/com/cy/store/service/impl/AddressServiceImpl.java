@@ -129,6 +129,26 @@ public class AddressServiceImpl implements IAddressService {
     }
 
     @Override
+    public Address getByAid(Integer aid, Integer uid) {
+        Address address = addressMapper.findByAid(aid);
+        if (address == null) {
+            throw new AddressNotFoundException("查询的地址不存在！");
+        }
+        if (!address.getUid().equals(uid)) {
+            throw new AccessDeniedException("非法访问！");
+        }
+        address.setModifiedUser(null);
+        address.setProvinceCode(null);
+        address.setCityCode(null);
+        address.setAreaCode(null);
+        address.setModifiedTime(null);
+        address.setCreatedTime(null);
+        address.setCreatedUser(null);
+
+        return address;
+    }
+
+    @Override
     public void updateOneAddress(Address address, String modifiedUser) {
         String provinceName = districtService.getNameByCode(address.getProvinceCode());
         String cityName = districtService.getNameByCode(address.getCityCode());

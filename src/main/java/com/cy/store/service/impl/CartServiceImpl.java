@@ -10,7 +10,9 @@ import com.cy.store.vo.CartVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -75,5 +77,51 @@ public class CartServiceImpl implements ICartService {
            throw new UpdateException("更新失败！");
        }
        return num;
+    }
+
+    @Override
+    public List<CartVO> getVOByCid(Integer uid, Integer[] cids) {
+        List<CartVO> list = cartMapper.findVOByCid(cids);
+        Iterator<CartVO> it = list.iterator();
+        //有问题的
+        while (it.hasNext()) {
+            CartVO vo = it.next();
+            if (!vo.getUid().equals(uid)) {
+                list.remove(vo);
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public Integer updateCartNumByCid(Integer num, Integer cid, String username, Date modifiedTime) {
+        Cart cart = cartMapper.findByCid(cid);
+        if (cart == null) {
+            throw new CartNotFoundException("购物车内无这条数据，增加失败");
+        }
+        return cartMapper.updateNumByCid(cid, num, username, modifiedTime);
+    }
+
+    @Override
+    public Cart queryCartVoByCid(Integer cid) {
+        return cartMapper.findByCid(cid);
+    }
+
+    @Override
+    public Integer deleteCartByCid(Integer cid) {
+        Integer res = cartMapper.deleteCartByCid(cid);
+        if (res == 0) {
+            throw new DeleteException("删除数据异常！");
+        }
+        return res;
+    }
+
+    @Override
+    public Integer deleteCartByUidAndPid(Integer uid, Integer pid) {
+        Integer res = cartMapper.deleteCartByUidAndPid(uid, pid);
+        if (res == 0) {
+            throw new DeleteException("删除数据异常！");
+        }
+        return res;
     }
 }

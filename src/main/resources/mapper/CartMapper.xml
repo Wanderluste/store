@@ -49,4 +49,39 @@
         SELECT * FROM t_cart
         WHERE  cid=#{cid}
     </select>
+    <select id="findVOByCid" resultType="com.cy.store.vo.CartVO">
+        SELECT
+            cid,
+            uid,
+            pid,
+            t_cart.price,
+            t_cart.num,
+            t_product.title,
+            t_product.image,
+            t_product.price AS realPrice
+        FROM
+            t_cart LEFT JOIN t_product ON t_cart.pid=t_product.id
+        WHERE cid IN (
+            <foreach collection="array" item="cid" separator=",">
+                #{cid}
+            </foreach>
+            )
+        ORDER BY
+            t_cart.created_time DESC
+    </select>
+    <select id="queryVOByCid" resultType="com.cy.store.vo.CartVO">
+        select c.cid, c.pid, c.uid, c.price, c.num, p.title,p.image,p.price AS real_price
+        FROM t_cart c LEFT JOIN t_product p
+        ON c.pid = p.id
+        WHERE c.cid = #{cid}
+        order by c.created_time desc
+    </select>
+    <delete id="deleteCartByCid">
+        delete from t_cart
+        where cid=#{cid}
+    </delete>
+    <delete id="deleteCartByUidAndPid">
+        delete from t_cart
+        where uid=#{uid} and pid=#{pid}
+    </delete>
 </mapper>

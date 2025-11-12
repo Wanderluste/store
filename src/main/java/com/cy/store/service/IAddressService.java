@@ -19,5 +19,6 @@ public interface IAddressService {
     void delete(Integer aid, Integer uid, String username);
     Address queryAddressByAid(Integer aid);
 
+    Address getByAid(Integer aid, Integer uid);
     void updateOneAddress(Address address,String modifiedUser);
 }

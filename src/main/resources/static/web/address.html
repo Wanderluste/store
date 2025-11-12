@@ -271,16 +271,13 @@
 		<!--页脚结束-->
 		<script type="text/javascript">
 			$(document).ready(function () {
-				$(".header").load("components/head.html")
-				$(".footer").load("components/footer.html")
-				$(".middleNavigation").load("components/middleNavigationBar.html")
 				showAddressList();
 			})
 			function showAddressList() {
 				//非常关键的刷新步骤
 				$("#address-list").empty();
 				$.ajax({
-					url: "/addresses/",
+					url: "/addresses",
 					type: "GET",
 					dataType: "JSON",
 					success: function (res) {

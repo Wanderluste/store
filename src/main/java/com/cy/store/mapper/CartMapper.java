@@ -39,4 +39,12 @@ public interface CartMapper {
     List<CartVO> findVOByUid(Integer uid);
 
     Cart findByCid(Integer cid);
+
+    List<CartVO> findVOByCid(Integer[] cids);
+
+    CartVO queryVOByCid(Integer cid);
+
+    Integer deleteCartByCid(Integer cid);
+
+    Integer deleteCartByUidAndPid(Integer uid, Integer pid);
 }

@@ -1,8 +1,10 @@
 package com.cy.store.service;
 
+import com.cy.store.entity.Cart;
 import com.cy.store.entity.Product;
 import com.cy.store.vo.CartVO;
 
+import java.util.Date;
 import java.util.List;
 
 /** 购物车业务层接口  */
@@ -19,4 +21,16 @@ public interface ICartService {
     List<CartVO> getVOByUid(Integer uid);
 
     Integer addNum(Integer cid, Integer uid, String username);
+
+    List<CartVO> getVOByCid(Integer uid, Integer[] cids);
+
+    Integer updateCartNumByCid(Integer num, Integer cid, String username, Date modifiedTime);
+
+    Cart queryCartVoByCid(Integer cid);
+
+
+
+    Integer deleteCartByCid(Integer cid);
+
+    Integer deleteCartByUidAndPid(Integer uid, Integer pid);
 }

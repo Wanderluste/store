@@ -21,7 +21,7 @@
 		<link rel="stylesheet" type="text/css" href="../css/footer.css" />
 		<link rel="stylesheet" type="text/css" href="../css/orderConfirm.css" />
 		<link rel="stylesheet" type="text/css" href="../css/cart.css" />
-		<script src="../js/orderConfirm.js" type="text/javascript" charset="utf-8"></script>
+<!--		<script src="../js/orderConfirm.js" type="text/javascript" charset="utf-8"></script>-->
 	</head>
 
 	<body>
@@ -116,9 +116,7 @@
 								<p>选择收货地址：</p>
 							</label>
 							<select name="aid" id="address-list" class="form-control">
-								<option>八戒&nbsp;&nbsp;&nbsp;家&nbsp;&nbsp;&nbsp;北京市房山区高老庄3排6号&nbsp;&nbsp;&nbsp;1380***1234</option>
-								<option>八戒&nbsp;&nbsp;&nbsp;公司&nbsp;&nbsp;&nbsp;北京市海淀区中关村中路1号1001室&nbsp;&nbsp;&nbsp;1380***1234</option>
-								<option>八戒&nbsp;&nbsp;&nbsp;宿舍&nbsp;&nbsp;&nbsp;北京市海淀区永丰镇30号&nbsp;&nbsp;&nbsp;1380***1234</option>
+								<!--待填充内容-->
 							</select>
 						</div>
 						<div class="panel panel-primary">
@@ -137,13 +135,7 @@
 										</tr>
 									</thead>
 									<tbody id="cart-list" class="cart-body">
-										<tr>
-											<td><img src="../images/portal/12DELLXPS13-silvery/collect.png" class="img-responsive" /></td>
-											<td>联想(Lenovo)小新Air13 Pro 13.3英寸14.8mm超轻薄笔记本电脑</td>
-											<td>¥<span>5298</span></td>
-											<td>1</td>
-											<td><span>5298</span></td>
-										</tr>
+									<!--待填充内容-->
 									</tbody>
 								</table>
 								<div class="total-bar">
@@ -249,6 +241,302 @@
 
 		</footer>
 		<!--页脚结束-->
+		<script src="../js/herf.js" type="text/javascript" charset="UTF-8"></script>
+		<script type="text/javascript">
+			var pid = getUrlParam("pid");
+			var num = getUrlParam("num");
+			var data;
+
+			function showOrderFromProductHtml() {
+				$.ajax({
+					url: "/products/" + pid + "/details",
+					type: "get",
+					dataType: "json",
+					success:function (res) {
+						let product = res.data;
+						let str = "";
+						let totalPrice = product.price * num;
+						str = "<tr>"
+								+ "<td id='pid' hidden='hidden'>" + pid + "</td>"
+								+ "<td><img src=.." + product.image + "collect.png" + " class='img-responsive' /></td>"
+								+ "<td>" + product.title + "</td>"
+								+ "<td>¥<span>" + product.price + "</span></td>"
+								+ "<td id=num>" + num + "</td>"
+								+ "<td><span>" + totalPrice + "</span></td>"
+								+ "</tr>"
+						$("#cart-list").append(str)
+						$("#all-count").empty().html(1)
+						$("#all-price").empty().html(totalPrice)
+					},
+					error:function () {
+						alert("购买失败！！")
+					}
+				})
+			}
+
+			function showOrderItem(){
+				data = location.search.substr(1)//截取地址栏url?后的第二个元素，即购物车商品的cid
+				//记录商品总数和总价格
+				let totalNum = 0;
+				let countPrice = 0;
+				//自动发送ajax请求查询url地址上的cid信息
+				$.ajax({
+					url : "/carts/list",
+					type: "get",
+					data: data,
+					dataType: "json",
+					success:function(res){
+							//填充信息
+						$("#cart-list").empty()
+						for (let i = 0; i < res.data.length; i++) {
+							let str = "";
+							let cartVo = res.data[i]
+							let totalPrice = cartVo.price * cartVo.num
+							str = "<tr>"
+									+ "<td id=cid" + i + " hidden='hidden'>" + cartVo.cid + "</td>"
+									+ "<td><img src=.." + cartVo.image + "collect.png" + " class='img-responsive' /></td>"
+									+ "<td>" + cartVo.title + "</td>"
+									+ "<td>¥<span>" + cartVo.price + "</span></td>"
+									+ "<td id=num" + i +  " >" + cartVo.num + "</td>"
+									+ "<td><span>" + totalPrice + "</span></td>"
+									+ "</tr>"
+							$("#cart-list").append(str)
+							//计算商品的数量和总金额
+							totalNum = totalNum + cartVo.num
+							countPrice = countPrice + totalPrice;
+						}
+						$("#all-count").empty().html(totalNum)
+						$("#all-price").empty().html(countPrice)
+					},
+					error: function () {
+						alert("订单创建失败")
+					}
+				})
+
+			}
+
+			function queryAddress(){
+				$.ajax({
+					url: "/addresses",
+					type: "get",
+					success:function (res) {
+						//表示用户已经添加了收货地址
+						if (res.data.length !== 0){
+							$("#address-list").empty()
+							for (let i = 0; i < res.data.length; i++) {
+								let address = res.data[i]
+								let str = ""
+								str = "<option value=" + address.aid + ">"
+										+ address.name + "&nbsp;&nbsp;&nbsp;"
+										+ address.tag + "&nbsp;&nbsp;&nbsp;"
+										+ address.provinceName + address.cityName + address.areaName + address.address
+										+ "&nbsp;&nbsp;&nbsp;" + address.phone
+										+ "</option>"
+								$("#address-list").append(str)
+							}
+						}else {
+							if (confirm("尚未添加收货地址，请先通过收货管理添加收货地址！！")){
+								location.href = "address.html"
+							}
+							let str = "<option>" + "暂未添加收货地址，请先通过收货管理添加收货地址" + "</option>"
+							$("#address-list").empty().append(str).attr("disabled","disabled")
+						}
+
+					}
+				})
+			}
+
+			function getSelectOption(){
+				//定位到要查询指定id的元素
+				let element = window.document.getElementById("address-list");
+				//选中索引
+				let index = element.selectedIndex;
+				//获取选中的option的值
+				return element.options[index].value;
+			}
+
+			function fromProductSentAjaxCreateOrderItem(oid){
+				$.ajax({
+					url: "/orders/createOrderItem",
+					type: "post",
+					data: {oid:oid,pid:pid,num:num},
+					dataType: "json",
+					success:function (res) {
+							//跳转到指定页面
+						location.href = "payment.html?oid=" + oid
+					},
+					error: function (error){
+						alert("服务器内部异常！")
+					}
+				})
+			}
+
+			function useCidSentAjaxCreateOrderItem(oid){
+				//获取用户选中了几个商品
+				let size = $("#cart-list").children("tr").length
+				//遍历获取每个商品的pid值
+				for (let i = 0; i < size; i++) {
+					let cid = JSON.parse($("#cid"+ i).html())
+					let num = JSON.parse($("#num"+ i).html())
+					$.ajax({
+						url: "/orders/createOrderItem",
+						type: "post",
+						data: {cid:cid,oid:oid,num:num},
+						dataType: "json",
+						success:function (res) {
+								//跳转到指定页面
+							location.href = "payment.html?oid=" + oid
+						},
+						error: function (error){
+							alert("服务器内部异常！")
+						}
+
+					})
+				}
+			}
+
+			$(function () {
+				//页面加载完成自动发送请求查询用户地址并填充数据
+				queryAddress();
+
+				if (pid !== null && num !== null){ //两者都不为null表示从商品界面进入
+					//查询从商品界面选中的商品信息
+					showOrderFromProductHtml();
+				}else { //否则就是从购物车页面进入
+					//查询购物车商品信息
+					showOrderItem();
+				}
+
+				//给在线支付按钮绑定单击事件
+				$("#btn-create-order").click(function() {
+
+					//获取用户选择的是哪一个地址的value值
+					let aid = getSelectOption();
+					let totalPrice = JSON.parse($("#all-price").html());
+					$.ajax({
+						url: "/orders/createOrder",
+						type: "post",
+						data: {aid:aid,totalPrice:totalPrice},
+						dataType: "json",
+						success:function (res) {
+							//获取已经创建的order的订单号
+							let oid = res.data.oid
+							//获取地址栏上的参数
+							let urlParam = location.search.substr(1)//截取地址栏url?后的第二个元素
+							//判断是否携带了cids，不等于-1代表是从购物车进入这个界面
+							if(urlParam.search("cids") !== -1){
+								//获取每个cid取创建orderItem数据
+								useCidSentAjaxCreateOrderItem(oid);
+							}else{ //等于1代表不是从购物车进入这个界面
+								//实现商品界面的立即购买创建订单
+								fromProductSentAjaxCreateOrderItem(oid);
+							}
+						},
+						error: function (error){
+							alert(error.message)
+						}
+					})
+				})
+
+			})
+
+
+			// $(document).ready(function () {
+			// 	showCartList();
+			// 	showAddressList();
+			// })
+			// $("#btn-create-order").click(function () {
+			// 	let aid = $("#address-list").val();
+			// 	let cids = location.search.substring(1);
+			// 	$.ajax({
+			// 		url: "/orders/create",
+			// 		type: "POST",
+			// 		data: "aid=" + aid + "&" + cids,//拼接网页链接
+			// 		dataType: "JSON",
+			// 		success: function (json) {
+			// 			if (json.state == 200) {
+			// 				location.href = "payment.html";
+			// 				alert("订单创建成功！");
+			// 			}
+			// 		},
+			// 		error: function (xhr) {
+			// 			alert("订单数据加载异常！" + xhr.status);
+			// 		}
+			// 	})
+			// })
+			//
+			// function showCartList() {
+			// 	$("#cart-list").empty();
+			// 	$.ajax({
+			// 		url: "/carts/list",
+			// 		type: "GET",
+			// 		data: location.search.substring(1),
+			// 		dataType: "JSON",
+			// 		success: function (json) {
+			// 			if (json.state == 200) {
+			// 				let list = json.data;
+			// 				let allCount = 0;
+			// 				let allPrice = 0;
+			// 				for (let i = 0; i < list.length; i++) {
+			// 					let tr = '<tr>\n' +
+			// 							'<td><img src="..#{image}collect.png" class="img-responsive" /></td>\n' +
+			// 							'<td>#{title}</td>\n' +
+			// 							'<td>¥<span>#{price}</span></td>\n' +
+			// 							'<td>#{num}</td>\n' +
+			// 							'<td><span>#{totalPrice}</span></td>\n' +
+			// 							'</tr>'
+			// 					tr = tr.replace(/#{image}/g, list[i].image);
+			// 					tr = tr.replace(/#{title}/g, list[i].title);
+			// 					tr = tr.replace(/#{price}/g, list[i].price);
+			// 					tr = tr.replace(/#{num}/g, list[i].num);
+			// 					tr = tr.replace(/#{totalPrice}/g, list[i].price * list[i].num);
+			// 					$("#cart-list").append(tr);
+			// 					allCount += list[i].num;
+			// 					allPrice += list[i].price * list[i].num;
+			// 				}
+			// 				console.log(allPrice)
+			// 				console.log(allCount)
+			// 				$("#all-count").html(allCount);
+			// 				$("#all-price").html(allPrice);
+			// 			}
+			// 		},
+			// 		error: function (xhr) {
+			// 			alert("购物车列表加载失败！" + xhr.status);
+			// 		}
+			// 	})
+			// }
+			// function showAddressList() {
+			// 	$("#address-list").empty();
+			// 	$.ajax({
+			// 		url: "/addresses",
+			// 		type: "GET",
+			// 		dataType: "JSON",
+			// 		success: function (json) {
+			// 			if (json.state == 200) {
+			// 				let list = json.data;
+			// 				for (let i = 0; i < list.length; i++) {
+			// 					let	otp = "<option value='#{aid}'>#{name}&nbsp;&nbsp;&nbsp;#{tag}&nbsp;&nbsp;&nbsp;#{provinceName}#{cityName}#{areaName}#{address}&nbsp;&nbsp;&nbsp;#{phone}</option>"
+			// 					otp = otp.replace(/#{aid}/g, list[i].aid);
+			// 					otp = otp.replace(/#{name}/g, list[i].name);
+			// 					otp = otp.replace(/#{tag}/g, list[i].tag);
+			// 					otp = otp.replace(/#{provinceName}/g, list[i].provinceName);
+			// 					otp = otp.replace(/#{cityName}/g, list[i].cityName);
+			// 					otp = otp.replace(/#{areaName}/g, list[i].areaName);
+			// 					otp = otp.replace(/#{address}/g, list[i].address);
+			// 					otp = otp.replace(/#{phone}/g, list[i].phone);
+			//
+			// 					$("#address-list").append(otp);
+			// 				}
+			//
+			// 			}
+			// 		},
+			// 		error: function (xhr) {
+			// 			alert("购物车对应的收货地址列表加载失败！" + xhr.status);
+			// 		}
+			// 	})
+			// }
+
+		</script>
 	</body>
 
 </html>

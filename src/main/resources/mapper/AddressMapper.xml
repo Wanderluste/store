@@ -31,7 +31,11 @@
         SELECT count(*) FROM t_address WHERE uid=#{uid}
     </select>
     <select id="findByUid" resultType="com.cy.store.entity.Address">
-        SELECT *FROM t_address WHERE uid=#{uid}
+        SELECT aid, uid, name, province_name as provinceName, province_code as provinceCode,
+               city_name as cityName, city_code as cityCode, area_name as areaName,
+               area_code as areaCode, zip, address, phone, tel, tag, is_default as isDefault
+        FROM t_address
+        WHERE uid=#{uid}
         ORDER BY is_default DESC, created_time DESC
     </select>
     <update id="updateNonDefault">

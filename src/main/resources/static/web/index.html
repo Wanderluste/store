@@ -78,11 +78,17 @@
 				</ul>
 			</div>
 			<div class="col-md-6">
-				<form action="search.html" class="form-inline pull-right" role="form">
+				<form id="searchForm"
+					  onsubmit="return checkIfHaveVal()"
+					  action="search.html"
+					  class="form-inline pull-right"
+					  role="form">
 					<div class="form-group">
 						<input type="text" class="form-control" id="search" name="search" placeholder="请输入商品名称进行搜索">
+						<input type="hidden"  id="pageNum" name="pageNum" value="1">
+						<input type="hidden"  id="pageSize" name="pageSize" value="12">
 					</div>
-					<button type="submit" class="btn btn-default btn-sm"><span class="fa fa-search"></span></button>
+					<button id="toSearch" type="submit" class="btn btn-default btn-sm"><span class="fa fa-search"></span></button>
 				</form>
 			</div>
 		</div>
@@ -143,7 +149,7 @@
 					</div>
 				</div>
 			</div>
-			
+
 			<!--推荐栏目-->
 			<div class="row">
 				<div class="col-md-6">
@@ -151,7 +157,7 @@
 						<div class="panel-heading">
 							<p class="panel-title">新到好货</p>
 						</div>
-						<div class="panel-body panel-item">
+						<div id="new-list" class="panel-body panel-item">
 							<div class="col-md-12">
 								<div class="col-md-7 text-row-2"><a href="product.html">齐心（COMIX）C5902 A5优品商务笔记本子记事本日记本122张</a></div>
 								<div class="col-md-2">¥18</div>
@@ -292,35 +298,80 @@
 		<!--页脚结束-->
 		<script type="text/javascript">
 			$(document).ready(function () {
-				showAddressList();
+				showHotList();
+				showNewList();
 			})
-			function showAddressList() {
-				$("#hot-list").empty(); // 先清空容器（也可以在最后用html()一次性覆盖）
+
+			function jumpWithId(id){
+				//拼接跳转连接并带上需要查询的aid值
+				let url = "product.html?id=" + id;
+				location.href = url;
+			}
+
+			function checkIfHaveVal(){
+				let val = $("#search").val()
+				if (val === '') {
+					alert("请先输入搜索内容！")
+					return false;
+				}
+			}
+
+			function showHotList() {
+				$("#hot-list").empty();
 				$.ajax({
 					url: "/products/hot_list",
 					type: "GET",
 					dataType: "JSON",
-					success: function (json) {
-						if (!json || !Array.isArray(json.data)) {
-							console.error("数据格式错误");
-							return;
+					success: function (res) {
+						for (let i = 0; i < res.data.length; i++) {
+							let str = "";
+							let product = res.data[i]
+							let image = ".." + product.image + "collect.png"
+							str = "<div class='col-md-12'>"
+									+ "<div class=\"col-md-7 text-row-2\">"
+									+ "<a href='javascript:void(0);'onclick='jumpWithId(#{id})'>" + product.title + "</a>"
+									+ "</div>"
+									+ "<div class=\"col-md-2\">￥" + product.price + "</div>"
+									+ "<div class=\"col-md-3\">"
+									+ "<img src=" + image  + " class='img-responsive' />"
+									+ "</div>"
+									+ "</div>"
+							str = str.replaceAll("#{id}",product.id)
+							$("#hot-list").append(str)
 						}
-						let list = json.data;
-						let html = ''; // 先定义一个空字符串用于拼接所有HTML
-						for (let i = 0; i < list.length; i++) {
-							// 每次循环只拼接字符串，不操作DOM
-							let itemHtml = '<div class="col-md-12">'
-									+ '<div class="col-md-7 text-row-2"><a href="product.html?id=' + list[i].id + '">' + list[i].title + '</a></div>'
-									+ '<div class="col-md-2">¥' + list[i].price + '</div>'
-									+ '<div class="col-md-3"><img src="../' + list[i].image + 'collect.png" class="img-responsive"/></div>'
-									+ '</div>';
-							html += itemHtml; // 累加字符串
-						}
-						// 循环结束后，一次性将所有HTML插入DOM
-						$("#hot-list").html(html);
 					},
-					error: function(xhr, status, error) {
-						console.error("请求失败:", error);
+					error: function () {
+						alert("查询错误，请等待攻城狮修复！！")
+					}
+				})
+			}
+
+			function showNewList() {
+				$("#new-list").empty();
+				$.ajax({
+					url : "/products/new_list",
+					type: "get",
+					dataType: "json",
+					success: function (res) {
+						for (let i = 0; i < res.data.length; i++) {
+							let str = "";
+							let product = res.data[i]
+							let image = ".." + product.image + "collect.png"
+							str = "<div class='col-md-12'>"
+									+ "<div class=\"col-md-7 text-row-2\">"
+									+ "<a href='javascript:void(0);'onclick='jumpWithId(#{id})'>" + product.title + "</a>"
+									+ "</div>"
+									+ "<div class=\"col-md-2\">￥" + product.price + "</div>"
+									+ "<div class=\"col-md-3\">"
+									+ "<img src=" + image  + " class='img-responsive' />"
+									+ "</div>"
+									+ "</div>"
+							str = str.replaceAll("#{id}",product.id)
+							$("#new-list").append(str)
+						}
+					},
+					error: function () {
+						alert("查询错误，请等待攻城狮修复！！")
 					}
 				})
 			}

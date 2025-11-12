@@ -32,10 +32,13 @@
 		<!--主体-->
 		<div class="container mycontent text-left">
 			<!--透明层 -->
-			<div class="loginDiv">
-				<p>用户登录</p>
+			<div class="loginDiv" style="height: 48%;">
+				<div id="error-msg"  style="color: red;font-weight:bold;padding-top: 10px"  class="pull-right">
+				</div>
+				<div style="padding-top: 10px;font-size: larger;padding-left: 10px" >用户登录
+				</div>
 				<!--表单开始-->
-				<form id="form-login" action="index.html"  class="form-horizontal" role="form">
+				<form id="form-login" style="padding-top: 10px"  class="form-horizontal" role="form">
 					<!--用户名-->
 					<div class="form-group">
 						<label for="username" class="col-md-3 control-label">名字：</label>
@@ -44,27 +47,27 @@
 						</div>
 					</div>
 					<!--密码-->
-					<div class="form-group">
+					<div class="form-group" >
 						<label for="password" class="col-md-3 control-label"> 密码：</label>
 						<div class="col-md-8">
-							<input name="password" type="text" class="form-control" id="password"  placeholder="请输入密码">
+							<input id="password" name="password" type="password" class="form-control" id="password"  placeholder="请输入密码">
 						</div>
+						<img id="img" onclick="showPasswordOrNot('password','img')" src="../images/img/open.jpeg" style="width: 20px;padding-top: 4px;">
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label"> 验证码：</label>
+						<div class="col-md-4">
+							<input id="code" name="code" type="text" style="width: 120px;height: 40px" class="form-control" placeholder="请输入验证码"/>
+						</div>
+						<img id="loginKaptcha" src="/kaptcha/kaptcha-image" onclick="reFlashImg('loginKaptcha')" style="width: 140px;height: 45px;"/>
 					</div>
 					<!-- 记住我-->
-					<div class="form-group">
-						<div class="col-md-offset-3 col-md-6">
-							<div class="checkbox">
-								<label>
-									<input type="checkbox" id="auto">自动登录
-								</label>
-							</div>
-						</div>
-					</div>
 					<!--提交按钮-->
 					<div class="form-group">
 						<label class="col-md-3 control-label"></label>
 						<div class="col-md-8">
 							<input id="btn-login" class="btn btn-primary" type="button" value="登录" />
+							<input id="btn-toIndex" class="btn btn-primary" type="button" value="返回主页" />
 							<span class="pull-right"><small>还没有账号？</small><a href="register.html">注册</a></span>
 						</div>
 					</div>
@@ -143,30 +146,55 @@
 			</div>
 		</footer>
 		<!--页脚结束-->
+		<script src="../js/someFunction.js" type="text/javascript" charset="utf-8"></script>
 		<script type = "text/javascript">
-			$("#btn-login").click(function () {
-				$.ajax({
-					url: "/users/login",
-					type: "POST",
-					data: $("#form-login").serialize(),
-					dataType: "JSON",
-					success: function (JSON) {
-						if (JSON.state == 200) {
-							alert("登录成功");
-							//跳转页面
-							location.href = "index.html";
-							//登陆页面保存头像
-							$.cookie("avatar", JSON.data.avatar, {expires: 7, path: "/"});
-						} else {
-							alert("登录失败");
-						}
-
-					},
-					error: function (XHR) {
-						alert("登录时产生未知异常" + XHR.status);
+			function login() {
+				$("#btn-login").click(function () {
+					if ($("#username").val() == "" || $("#password").val() == ""){
+						$("#error-msg").html("请先输入登录信息")
+						return false;
 					}
+					if ($("#code").val() == ""){
+						$("#error-msg").html("验证码不能为空")
+						return false;
+					}
+					$.ajax({
+						url: "/users/login",
+						type: "POST",
+						data: $("#form-login").serialize(),
+						dataType: "JSON",
+						success: function (res) {
+							if (res.state == 200) {
+								alert("登录成功");
+								//跳转页面
+								location.href = "index.html";
+								//登陆页面保存头像
+								$.cookie("avatar", res.data.avatar, {expires: 7, path: "/"});
+							} else {
+								alert("登录失败");
+								$("#error-msg").html(res.message)
+							}
+
+						},
+						error: function (XHR) {
+							alert("登录时产生未知异常" + XHR.status);
+						}
+					});
 				});
-			});
+			}
+			$(function () {
+				//引入页脚
+				$(".footer").load("components/footer.html")
+
+				//登录功能
+				login();
+
+				//给返回主页绑定点击事件
+				$("#btn-toIndex").click(function () {
+					location.href = "index.html"
+				})
+
+			})
 		</script>
 	</body>
 </html>

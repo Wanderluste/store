@@ -17,10 +17,23 @@
     </resultMap>
     <select id="findHotList" resultMap="ProductEntityMap">
         SELECT * FROM t_product
-        WHERE status = 1 ORDER BY priority DESC LIMIT 0, 4
+        WHERE category_id = 163 and status = 1
+        ORDER BY priority DESC LIMIT 0, 4
+    </select>
+    <select id="findNewList" resultMap="ProductEntityMap">
+        SELECT * FROM t_product
+        WHERE category_id = 238 and status = 1
+        ORDER BY created_time DESC LIMIT 0, 4
     </select>
     <select id="findById" resultMap="ProductEntityMap">
         SELECT * FROM t_product
         WHERE id=#{id}
+    </select>
+    <select id="queryProductByTitle" resultMap="ProductEntityMap">
+        SELECT id,title,sell_point,price,image
+        FROM t_product
+        WHERE status = 1
+          AND title LIKE '%${title}%'
+        ORDER BY priority DESC
     </select>
 </mapper>

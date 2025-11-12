@@ -6,5 +6,11 @@ import java.util.List;
 
 public interface ProductMapper {
     List<Product> findHotList();
+
+    List<Product> findNewList();
+
     Product findById(Integer id);
+
+    List<Product> queryProductByTitle(String title);
+
 }

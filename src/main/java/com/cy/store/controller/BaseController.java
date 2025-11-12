@@ -44,7 +44,10 @@ public class BaseController {
         }else if (e instanceof CartNotFoundException) {
             result.setState(4007);
             result.setMassage("购物车数据不存在！");
-        } else if (e instanceof UpdateException) {
+        }else if (e instanceof OrderNotExistException) {
+            result.setState(4008);
+            result.setMassage("订单数据不存在！");
+        }else if (e instanceof UpdateException) {
             result.setState(5003);
             result.setMassage("更新数据产生异常");
         }else if (e instanceof FileEmptyException) {

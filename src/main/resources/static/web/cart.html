@@ -102,7 +102,7 @@
 								<thead>
 									<tr>
 										<th width="8%">
-											<input type="checkbox" class="ckall" onclick="checkall(this)" />全选</th>
+											<input type="checkbox" class="ckall" onclick="checkAll(this)" />全选</th>
 										<th width="110"></th>
 										<th width="29%">商品</th>
 										<th width="11%">单价</th>
@@ -174,7 +174,7 @@
 							</div>
 							<div>
 								<span class="pull-right">
-								<input type="button" value="  结  算  " class="btn btn-primary btn-lg link-account" />
+								<input type="submit" value="  结  算  " class="btn btn-primary btn-lg link-account" />
 							</span>
 							</div>
 						</form>
@@ -269,77 +269,256 @@
 		<!--页脚结束-->
 		<script type="text/javascript">
 			$(document).ready(function () {
-				showCartList();
-			})
-			function showCartList() {
-				$("#cart-list").empty();
-				$.ajax({
-					url: "/carts",
-					type: "GET",
-					dataType: "JSON",
-					success: function (json) {
-						let list = json.data;
-						for (let i = 0; i < list.length; i++) {
-							let tr = '<tr>\n' +
-									'<td>\n' +
-									'<input name="cids" value="#{cid}" type="checkbox" class="ckitem" />\n' +
-									'</td>\n' +
-									'<td><img src="..#{image}collect.png" class="img-responsive" /></td>\n' +
-									'<td>#{title}#{msg}</td>\n' +
-									'<td>¥<span id="goodsPrice#{cid}">#{singlePrice}</span></td>\n' +
-									'<td>\n' +
-									'<input id="price-#{cid}" type="button" value="-" class="num-btn" onclick="reduceNum(1)" />\n' +
-									'<input id="goodsCount#{cid}" type="text" size="2" readonly="readonly" class="num-text" value="#{num}">\n' +
-									'<input id="price+#{cid}" class="num-btn" type="button" value="+" onclick="addNum(#{cid})" />\n' +
-									'</td>\n' +
-									'<td><span id="goodsCast#{cid}">#{totalPrice}</span></td>\n' +
-									'<td>\n' +
-									'<input type="button" onclick="delCartItem(this)" class="cart-del btn btn-default btn-xs" value="删除" />\n' +
-									'</td>\n' +
-									'</tr>'
-							tr = tr.replaceAll(/#{cid}/g, list[i].cid);
-							tr = tr.replace(/#{image}/g, list[i].image);
-							tr = tr.replace(/#{title}/g, list[i].title);
-							tr = tr.replace(/#{msg}/g, list[i].realPice);
-							tr = tr.replace(/#{num}/g, list[i].num);
-							tr = tr.replace(/#{singlePrice}/g, list[i].price);
-							tr = tr.replace(/#{totalPrice}/g, list[i].price * list[i].num);
 
-							$("#cart-list").append(tr);
-						}
-					},
-					error: function (xhr) {
-						alert("购物车列表加载失败！" + xhr.message);
+				showCartList();
+
+				jumpWithCids();
+
+			})
+
+			var totalNum = 0;
+			var countPrice = 0;
+			//记录全选选择框的点击次数
+			var allClickNum = 0;
+
+			function checkAll(){
+				allClickNum += 1;
+				//根据全选按钮的状态设置所有class为ckitem的选中状态
+				$(".ckitem").prop("checked",$(".ckall").prop("checked"))
+
+				if (allClickNum % 2 === 0){ //取模2等于0说明全选的状态为取消
+					//设置商品数量和总价的价格全为0
+					$("#selectCount").empty().html(0)
+					$("#selectTotal").empty().html(0)
+				}else {
+					//设置商品数量和总价的价格
+					$("#selectCount").empty().html(totalNum)
+					$("#selectTotal").empty().html(countPrice)
+				}
+			}
+			
+			function checkOne() {
+				let length = $("#cart-list").children("tr").length;
+				let checkNum = $(".ckitem:checked").length;
+
+				if (length == checkNum) {
+					$(".ckall").prop("checked",true);
+				}
+				else {
+					$(".ckall").prop("checked",false);
+				}
+
+				let vselectCount = 0;
+				//选中商品的总价
+				let vselectTotal = 0;
+
+				for (let i = 0; i < length; i++) {
+					//计算每个商品的价格小计开始
+					//取出1行
+					let $tr = $($(".cart-body tr")[i]);
+					//取单价
+					let vprice = JSON.parse($tr.children(":eq(3)").children("span").html());
+					//取数量
+					let vnum = JSON.parse($tr.children(":eq(4)").children(".num-text").val());
+					//小计金额
+					let vtotal = vprice * vnum;
+					//赋值
+					$tr.children(":eq(5)").children("span").html("¥" + vtotal);
+					//计算每个商品的价格小计结束
+
+					//检查是否选中
+					if ($tr.children(":eq(0)").children(".ckitem").prop("checked")) {
+						//计数
+						vselectCount += vnum;
+						//计总价
+						vselectTotal += vtotal;
 					}
+					//将选中的数量和价格赋值
+					$("#selectTotal").html(vselectTotal);
+					$("#selectCount").html(vselectCount);
+				}
+			}
+
+			function selDelCart() {
+				let trNum = $("#cart-list tr").length
+				let chooseNum = 0
+				let deletedCids = ""
+				let char = "&"
+				for (let i = 0; i <trNum; i++) {
+					if ($("#cid" + i).prop("checked")) {
+						chooseNum += 1;
+						let cids = JSON.parse($("#cid"+i).val());
+						let str = "cids=" + cids
+						if (i === trNum -1){
+							deletedCids += str
+						}else {
+							deletedCids += str + char
+						}
+					}
+				}
+
+				if (chooseNum == 0) {
+					alert("请先选择需要删除的购物车商品！！！")
+					return false;
+				}
+
+				if (confirm("确定要删除这些商品吗？")) {
+					$.ajax({
+						url: "/carts/deleteCart",
+						type: "post",
+						data: deletedCids,
+						dataType: "json",
+						success: function (res) {
+							alert("批量删除成功")
+							showCartList();
+							$("#selectCount").html(0)
+							$("#selectTotal").html(0)
+						},
+						error: function () {
+							alert("删除失败")
+						}
+					})
+				}
+			}
+
+			function delCartItem(cids) {
+				if(confirm("确定要删除该商品吗？")){
+					$.ajax({
+						url:"/carts/deleteCart",
+						type: "POST",
+						data: "cids=" + cids,
+						//dataType: JSON,
+						success:function () {
+							alert("删除成功")
+							location.reload();
+						},
+						error: function (error) {
+							alert("删除失败！")
+						}
+					})
+				}
+			}
+
+			function checkIsNotChoose(){
+				let chooseNum = $(".ckitem.checked").length
+				//如果chooseNum的值等于0代表用户没任何选择商品不允许跳转
+				if (chooseNum === 0){
+					alert("请先选择需要结算的购物车商品！！！")
+					return false;
+				}
+			}
+
+			function jumpWithCids() {
+				$(".link-success").click(function () {
+					location.href = "paySuccess.html";
 				})
 			}
-			function addNum(cid) {
+
+			function addNum(num) {
+				var n = parseInt($("#goodsCount"+num).val());
+				$("#goodsCount"+num).val(n + 1);
+				calcRow(num);
+			}
+			function reduceNum(num) {
+				var n = parseInt($("#goodsCount" + num).val());
+				if (n == 0) {
+					return;
+				} else {
+					$("#goodsCount" + num).val(n - 1);
+					calcRow(num);
+				}
+			}
+			
+			function calcRow(num) {
+				var vprice = parseFloat($("#goodsPrice" + num).html());
+				var vnum = parseFloat($("#goodsCount" + num).val());
+				var vtotal = vprice * vnum;
+				$("#goodsCast" + num).html("￥" + vtotal);
+			}
+
+			function ajaxProductCountAdd(num) {
+				addNum(num)
+				let cid = $("#cid" + num).val();
+				let updateNum = $("#goodsCount" + num).val();
 				$.ajax({
-					url: "/carts/" + cid + "/num/add",
+					url: "/carts/updateCart",
 					type: "POST",
 					dataType: "JSON",
-					success: function (json) {
-						if (json.state == 200) {
-							$("#goodsCount" + cid).val(json.data);
-							//获取某个标签内部的内容
-							let price = $("#goodsPrice" + cid).html();
-							let totalPrice = price * json.data;
-							$("#goodsCast" + cid).html(totalPrice);
-						}else {
-							alert("增加购物车数据失败！");
-						}
-					},
-					error: function (xhr) {
-						alert("增加购物车商品数量产生异常！" + xhr.message);
+					data: {cid:cid, num:updateNum},
+					error: function () {
+						alert("增加失败，请等待攻城狮修复！！")
 					}
 				})
 			}
-			/*$(function() {
-				//返回链接
-				$(".link-account").click(function() {
-					location.href = "orderConfirm.html";
+
+			function ajaxProductCountRec(num) {
+				reduceNum(num)
+				let cid = $("#cid" + num).val();
+				let updateNum = $("#goodsCount" + num).val();
+				$.ajax({
+					url: "/carts/updateCart",
+					type: "POST",
+					dataType: "JSON",
+					data: {cid:cid, num:updateNum},
+					error: function () {
+						alert("增加失败，请等待攻城狮修复！！")
+					}
 				})
-			})*/
+			}
+
+			function showCartList() {
+				$.ajax({
+					url: "/carts/showCarts",
+					type: "get",
+					dataType: "json",
+					success: function (res) {
+						if (res.data.length !== 0){
+							//先清空列表
+							$("#cart-list").empty();
+							for (let i = 0; i < res.data.length; i++) {
+								let cart = res.data[i];
+								let idNum = i;
+								let image = ".." + cart.image + "collect.png";
+								let totalPrice = cart.price * cart.num
+								let str =  "<tr>"
+										+"<td><input onclick='checkOne()' id=cid" + idNum + " name='cids' value=" + cart.cid + " type='checkbox' class='ckitem' /></td>"
+										+ "<td><img  src=" + image  + " class='img-responsive' /></td>"
+										+ "<td>" + cart.title + "</td>"
+										+ "<td>¥<span id="+ "goodsPrice" + idNum +">"+ cart.price + "</span></td>"
+										+ "<td>"
+										+ "<input id=" + "countRec" + idNum + " type='button' value='-' class='num-btn' onclick='ajaxProductCountRec(#{idNum})' />"
+										+ "<input  id=" + "goodsCount"+ idNum +  " type='text' size='2' readonly='readonly' class='num-text' value=" + cart.num + ">"
+										+ "<input id=" + "countAdd" + idNum + " class='num-btn' type='button' value='+' onclick='ajaxProductCountAdd(#{idNum})' />"
+										+ "</td>"
+										+ "<td><span id=" + "goodsCast" + idNum + ">￥" + totalPrice + "</span></td>"
+										+ "<td>"
+										+ "<input type='button' onclick='delCartItem(#{deletedId})' class='cart-del btn btn-default btn-xs' value='删除' />"
+										+ "</td>"
+										+ "</tr>"
+								//替换数字
+								str = str.replaceAll("#{idNum}",idNum)
+								str = str.replaceAll("#{deletedId}",cart.cid)
+
+								//在表格中插入数据
+								$("#cart-list").append(str)
+								// 计算商品总数量和总价格
+								totalNum += cart.num;
+								countPrice  = countPrice  + totalPrice;
+
+
+							}
+
+						}else{
+							str = "<tr><td colspan='12' style='font-weight: bold;color: red;padding: 20px;font-size: medium'>" +
+									"购物车暂无商品，请先去添加商品</td></tr>"
+							$("#cart-list").empty().append(str)
+						}
+					},
+					error : function () {
+						alert("服务器出现错误，查询失败！")
+					}
+				})
+			}
 
 		</script>
 	</body>

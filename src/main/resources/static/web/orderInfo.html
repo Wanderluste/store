@@ -236,6 +236,19 @@
 			</div>
 		</footer>
 		<!--页脚结束-->
+		<script src="../js/TimeTran.js" type="text/javascript" charset="UTF-8"></script>
+		<script type="text/javascript">
+			function addDate(oldDate,days){
+				//根据传进的日期创建date对象
+				let newDate = new Date(oldDate);
+				//获得日期的当前日时间
+				let today = newDate.getDate();
+				//进行时间累加
+				newDate = newDate.setDate(today + days)
+				//返回变化后的时间
+				return newDate;
+			}
+		</script>
 	</body>
 
 </html>
