@@ -14,6 +14,7 @@
 		<link href="../bootstrap3/css/bootstrap.css" rel="stylesheet" type="text/css">
 		<script src="../bootstrap3/jquery-1.9.1.min.js"></script>
 		<script src="../bootstrap3/js/bootstrap.js"></script>
+		<script src="https://webapi.amap.com/maps?v=2.0&key=368b024dd353e7b5e0f3fd405d7871c6"></script>
 		<!-- 字体图标 -->
 		<link rel="stylesheet" href="../bootstrap3/font-awesome-4.7.0/css/font-awesome.css" />
 		<link rel="stylesheet" type="text/css" href="../css/layout.css" />
@@ -144,6 +145,8 @@
 					<div class="panel-body">
 						<!--新增收货地址表单开始-->
 						<form id="form-add-new-address" class="form-horizontal" role="form">
+							<input type="hidden" name="lng">
+							<input type="hidden" name="lat">
 							<div class="form-group">
 								<label class="col-md-2 control-label"><span class="txtred">*</span>收货人：</label>
 								<div class="col-md-8">
@@ -202,6 +205,14 @@
 								</div>
 							</div>
 						</form>
+						<!-- === 地图功能区域（广州中心） === -->
+						<div class="form-group">
+							<label class="col-md-2 control-label">地图选点：</label>
+							<div class="col-md-8">
+								<div id="map" style="width:100%; height:400px; border:1px solid #ccc; border-radius:6px;"></div>
+								<p class="help-block">点击地图可自动填写详细地址</p>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -406,6 +417,79 @@
 						alert("新增收货地址产生未知错误" + XHR.status);
 					}
 				});
+			});
+
+			function fillProvinceCityArea(province, city, district) {
+				// 省份
+				$("#province-list option").each(function() {
+					if($(this).text() === province){
+						$(this).prop("selected", true).change(); // change 会触发城市下拉加载
+					}
+				});
+
+				// 等城市选项加载完成后再选中城市
+				setTimeout(function(){
+					$("#city-list option").each(function(){
+						if($(this).text() === city){
+							$(this).prop("selected", true).change(); // change 会触发区县下拉加载
+						}
+					});
+				}, 300); // 延迟 300ms 等 AJAX 完成
+
+				// 等区县选项加载完成后再选中区县
+				setTimeout(function(){
+					$("#area-list option").each(function(){
+						if($(this).text() === district){
+							$(this).prop("selected", true);
+						}
+					});
+				}, 600); // 再延迟 600ms
+			}
+
+
+
+			// === 地图初始化 ===
+			var map = new AMap.Map('map', {
+				zoom: 13,
+				center: [113.327, 23.129] // 广州中心
+			});
+			var marker;
+
+			var map = new AMap.Map('map', {
+				zoom: 13,
+				center: [113.327, 23.129] // 广州天河中心点
+			});
+
+			var marker;
+
+			map.on('click', function(e) {
+				var lng = e.lnglat.lng;
+				var lat = e.lnglat.lat;
+
+				if(marker) marker.setMap(null);
+				marker = new AMap.Marker({ position:[lng,lat], map:map });
+
+				fetch(`/api/map/regeo?lng=${lng}&lat=${lat}`)
+						.then(res => res.text())
+						.then(addr => {
+							// 填充详细地址
+							$("textarea[name='address']").val(addr);
+
+							// 简单拆分省市区
+							var regex = /^(.*?省|.*?自治区|北京市|天津市|上海市|重庆市)(.*?市|.*?地区|.*?盟)?(.*?区|.*?县|.*?市)?/;
+							var match = addr.match(regex);
+							if(match){
+								var province = match[1] ? match[1].trim() : "";
+								var city = match[2] ? match[2].trim() : "";
+								var district = match[3] ? match[3].trim() : "";
+								fillProvinceCityArea(province, city, district);
+							}
+
+							// 填充隐藏经纬度
+							$("input[name='lng']").val(lng);
+							$("input[name='lat']").val(lat);
+						})
+						.catch(err => console.error("解析地址失败:", err));
 			});
 		</script>
 	</body>
