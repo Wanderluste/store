@@ -1,10 +1,6 @@
 function getPidFromLastHtml(){
-    //接收上一个页面传来的连接
-    var hrefUrl = location.href;
-    //以url中的"="为截断点，形成一个数组
-    var param = hrefUrl.split("=")
-    //decodeURI解码得到想要的参数
-    var pid = decodeURI(param[1]);
+    const urlParams = new URLSearchParams(window.location.search);
+    const pid = urlParams.get('pid'); // null 如果不存在
     return pid;
 }
 

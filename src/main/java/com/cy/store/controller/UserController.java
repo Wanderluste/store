@@ -4,6 +4,7 @@ import com.cy.store.controller.ex.*;
 import com.cy.store.entity.User;
 import com.cy.store.service.IUserService;
 import com.cy.store.util.JsonResult;
+import com.google.code.kaptcha.Constants;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +40,12 @@ public class UserController extends BaseController{
         return new JsonResult<>(OK);
     }
     @RequestMapping("login")
-    public JsonResult<User> login(String username, String password, HttpSession session) {
+    public JsonResult<User> login(String username, String password, HttpSession session, String code) {
+        String validCode = (String) session.getAttribute(Constants.KAPTCHA_SESSION_KEY);
+        //判断验证码是否一致
+        if (!validCode.equals(code)){
+            throw new ValidCodeNotMatchException("验证码错误,请重试！");
+        }
         User data = userService.login(username, password);
         //向session对象中完成数据绑定
         //全局

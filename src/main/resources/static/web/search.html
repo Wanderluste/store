@@ -96,6 +96,12 @@
 			</div>
 		</div>
 		<!--头部结束-->
+		<div class="col-md-offset-2" style="padding-bottom: 20px;">
+
+			<div style="font-weight: bolder;color: red;font-size: larger">
+				<span id="searchText" style="color: black;font-size: smaller"></span><span id="resultText">&nbsp;的搜索结果：</span>
+			</div>
+		</div>
 		<!--导航结束-->
 		<div class="container">
 			<div id="productList" class="col-md-offset-1 col-md-10">
@@ -197,8 +203,9 @@
 			</div>
 		</footer>
 		<!--页脚结束-->
-		<script src="../js/herf.js"></script>
-		<script src="../js/someFunction.js"></script>
+		<script src="../js/imgmove.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/someFunction.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/herf.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
 			//获取上个页面传来的搜索关键字
 			//getUrlParam取的中文会乱码，不知道咋回事，只能用这个截断一下获取
@@ -313,6 +320,7 @@
 				//填充商品信息至页面
 				for (let i = 0; i < dataLength; i++) {
 					let product = res.data.list[i]
+					console.log(product.id)
 					productListStr = "<div class=\"col-md-3\">"
 							+ "<div class=\"goods-panel\">"
 							+ "<img src=.." + product.image + "collect.png" + "  class=\"img-responsive\" />"

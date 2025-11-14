@@ -65,6 +65,9 @@ public class BaseController {
         }else if (e instanceof FileTypeException) {
             result.setState(6004);
             result.setMassage("上传文件类型错误");
+        }else if (e instanceof ValidCodeNotMatchException) {
+            result.setState(6005);
+            result.setMassage("验证码错误！");
         } else if (e instanceof InsertException) {
             result.setState(5000);
             result.setMassage("注册时产生未知错误");

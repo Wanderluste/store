@@ -168,6 +168,7 @@
 								alert("登录成功");
 								//跳转页面
 								location.href = "index.html";
+								sessionStorage.setItem("user",JSON.stringify(res.data));
 								//登陆页面保存头像
 								$.cookie("avatar", res.data.avatar, {expires: 7, path: "/"});
 							} else {
@@ -193,7 +194,6 @@
 				$("#btn-toIndex").click(function () {
 					location.href = "index.html"
 				})
-
 			})
 		</script>
 	</body>

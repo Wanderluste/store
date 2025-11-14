@@ -81,11 +81,17 @@
 				</ul>
 			</div>
 			<div class="col-md-6">
-				<form action="search.html" class="form-inline pull-right" role="form">
-					<div class="form-group">
-						<input type="text" class="form-control" id="search" name="search" placeholder="请输入商品名称进行搜索">
+				<form  id="searchForm"
+					   onsubmit="return checkIfHaveVal()"
+					   action= "/web/search.html"
+					   class="form-inline pull-right"
+					   role="form">
+					<div class="form-group" >
+						<input type="text" class="form-control" id="search" name="title" placeholder="请输入商品名称进行搜索">
+						<input type="hidden"  id="pageNum" name="pageNum" value="1">
+						<input type="hidden"  id="pageSize" name="pageSize" value="12">
 					</div>
-					<button type="submit" class="btn btn-default btn-sm"><span class="fa fa-search"></span></button>
+					<button id="toSearch" type="submit" class="btn btn-default btn-sm"><span class="fa fa-search"></span></button>
 				</form>
 			</div>
 		</div>
@@ -296,12 +302,15 @@
 		</footer>
 		<!--页脚结束-->
 		<script type="text/javascript" src="../js/jquery-getUrlParam.js"></script>
+		<script src="../js/product.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/imgmove.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/herf.js" type="text/javascript" charset="UTF-8"></script>
+		<script src="../js/someFunction.js" type="text/javascript" charset="UTF-8"></script>
 		<script type="text/javascript">
-			let id = $.getUrlParam("id");
-			console.log("id=" + id);
+			var pid = getOne();
 			$(document).ready(function () {
 				$.ajax({
-					url: "/products/" + id + "/details",
+					url: "/products/" + pid + "/details",
 					type: "GET",
 					dataType: "JSON",
 					success: function (res) {
@@ -331,7 +340,7 @@
 					url: "/carts/add_to_cart",
 					type: "POST",
 					data: {
-						"pid": id,
+						"pid": pid,
 						"amount": $("#num").val(),
 
 					},
@@ -354,7 +363,7 @@
 				$.ajax({
 					url: "/favorites/addFavorites",
 					type: "post",
-					data: {pid:id},
+					data: {pid:pid},
 					dataType: "json",
 					success: function (res) {
 						alert("收藏成功！")
@@ -364,6 +373,13 @@
 					}
 				})
 			})
+			function checkIfHaveVal(){
+				let val = $("#search").val()
+				if (val === '') {
+					alert("请先输入搜索内容！")
+					return false;
+				}
+			}
 
 		</script>
 	</body>

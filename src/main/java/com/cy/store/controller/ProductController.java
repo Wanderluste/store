@@ -30,7 +30,7 @@ public class ProductController extends BaseController{
     @GetMapping("{id}/details")
     public JsonResult<Product> getById(@PathVariable("id") Integer id) {
         Product data = productService.findById(id);
-        return new JsonResult<Product>(OK, data);
+        return new JsonResult<>(OK, data);
     }
     @GetMapping("/{pageNum}/{pageSize}/{title}")
     public JsonResult<PageInfo<Product>> queryByTitle(@PathVariable("pageNum") Integer pageNum,
