@@ -254,11 +254,13 @@
 					dataType: "json",
 					success:function (res) {
 						let product = res.data;
+						let imagePath = product.image.trim(); // 去掉前后空格
+						imagePath = imagePath.replace(/\s+/g, ""); // 去掉中间空格
 						let str = "";
 						let totalPrice = product.price * num;
 						str = "<tr>"
 								+ "<td id='pid' hidden='hidden'>" + pid + "</td>"
-								+ "<td><img src=.." + product.image + "collect.png" + " class='img-responsive' /></td>"
+								+ "<td><img src=.." + imagePath + "collect.png" + " class='img-responsive' /></td>"
 								+ "<td>" + product.title + "</td>"
 								+ "<td>¥<span>" + product.price + "</span></td>"
 								+ "<td id=num>" + num + "</td>"
@@ -292,9 +294,10 @@
 							let str = "";
 							let cartVo = res.data[i]
 							let totalPrice = cartVo.price * cartVo.num
+							let image = cartVo.image.trim().replace(/\s+/g, "");
 							str = "<tr>"
 									+ "<td id=cid" + i + " hidden='hidden'>" + cartVo.cid + "</td>"
-									+ "<td><img src=.." + cartVo.image + "collect.png" + " class='img-responsive' /></td>"
+									+ "<td><img src=.." + image + "collect.png" + " class='img-responsive' /></td>"
 									+ "<td>" + cartVo.title + "</td>"
 									+ "<td>¥<span>" + cartVo.price + "</span></td>"
 									+ "<td id=num" + i +  " >" + cartVo.num + "</td>"

@@ -478,7 +478,8 @@
 							for (let i = 0; i < res.data.length; i++) {
 								let cart = res.data[i];
 								let idNum = i;
-								let image = ".." + cart.image + "collect.png";
+								const image = ".." + cart.image.trim().replace(/\s+/g, '') + "collect.png";
+								//let image = ".." + cart.image.trim() + "collect.png";
 								let totalPrice = cart.price * cart.num
 								let str =  "<tr>"
 										+"<td><input onclick='checkOne()' id=cid" + idNum + " name='cids' value=" + cart.cid + " type='checkbox' class='ckitem' /></td>"

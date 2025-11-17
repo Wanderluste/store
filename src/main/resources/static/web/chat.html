@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>电脑商城 - AI对话</title>
+
+    <link href="../bootstrap3/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="../bootstrap3/font-awesome-4.7.0/css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="../css/layout.css">
+    <link rel="stylesheet" type="text/css" href="../css/webindex.css">
+    <link rel="stylesheet" type="text/css" href="../css/footer.css">
+    <link rel="stylesheet" type="text/css" href="../css/top.css">
+
+    <style>
+        body { background-color: #f0f2f5; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; padding:0; margin:0; }
+
+        /* Header / Navbar */
+        .header, .top-nav { margin-bottom: 0; }
+
+        /* AI聊天容器 */
+        #aiChatContainer {
+            margin: 20px auto;
+            max-width: 800px;
+            width: 100%;
+            height: 500px;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        /* 消息显示区域 */
+        #chatBox {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ai .msg-text {
+            white-space: pre-wrap; /* 保留换行和空格 */
+        }
+
+        .message {
+            margin: 6px 0;
+            padding: 10px 14px;
+            border-radius: 18px;
+            max-width: 70%;
+            word-wrap: break-word;
+            line-height: 1.5;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            clear: both;
+            position: relative;
+        }
+        .user { background: #d1e7dd; color: #0f5132; align-self: flex-end; border-top-right-radius: 0; text-align: right; }
+        .ai { background: #fff3cd; color: #664d03; align-self: flex-start; border-top-left-radius: 0; text-align: left; }
+
+        #chatInput { display:flex; padding:10px; border-top:1px solid #e0e0e0; background:#fff; }
+        #aiMessage { flex:1; padding:8px 12px; border-radius:8px; border:1px solid #ccc; font-size:14px; resize:none; height:40px; }
+        #sendAiBtn { margin-left:8px; padding:8px 16px; border-radius:8px; border:none; background-color:#0d6efd; color:white; cursor:pointer; font-size:14px; }
+        #sendAiBtn:hover { background-color:#0b5ed7; }
+
+        /* 滚动条 */
+        #chatBox::-webkit-scrollbar { width:8px; }
+        #chatBox::-webkit-scrollbar-thumb { background:#c0c0c0; border-radius:4px; }
+        #chatBox::-webkit-scrollbar-track { background:#f0f0f0; }
+    </style>
+</head>
+<body>
+
+<!-- 头部 -->
+<header class="header">
+    <div class="row">
+        <div class="col-md-3">
+            <a href="index.html">
+                <img src="../images/index/stumalllogo.png" />
+            </a>
+        </div>
+        <div class="col-md-9 top-item">
+            <ul class="list-inline pull-right">
+                <li><a href="favorites.html"><span class="fa fa-heart"></span>&nbsp;收藏</a></li>
+                <li class="li-split">|</li>
+                <li><a href="orders.html"><span class="fa fa-file-text"></span>&nbsp;订单</a></li>
+                <li class="li-split">|</li>
+                <li><a href="cart.html"><span class="fa fa-cart-plus"></span>&nbsp;购物车</a></li>
+                <li class="li-split">|</li>
+                <li>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown">
+                            <span id="top-dropdown-btn"><span class="fa fa-gears"></span>&nbsp;管理 <span class="caret"></span></span>
+                        </button>
+                        <ul class="dropdown-menu top-dropdown-ul" role="menu">
+                            <li><a href="password.html">修改密码</a></li>
+                            <li><a href="userdata.html">个人资料</a></li>
+                            <li><a href="upload.html">上传头像</a></li>
+                            <li><a href="address.html">收货管理</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="li-split">|</li>
+                <li><a href="login.html"><span class="fa fa-user"></span>&nbsp;登录</a></li>
+            </ul>
+        </div>
+    </div>
+</header>
+
+<!-- 导航栏 -->
+<div class="row top-nav">
+    <div class="col-md-12">
+        <ul class="nav nav-pills">
+            <li class="active"><a href="index.html"><span class="fa fa-home"></span></a></li>
+            <li><a href="#">秒杀</a></li>
+            <li><a href="#">优惠券</a></li>
+            <li><a href="#">电脑VIP</a></li>
+            <li><a href="#">外卖</a></li>
+            <li><a href="#">超市</a></li>
+            <li><a href="chat.html">AI对话</a></li>
+        </ul>
+    </div>
+</div>
+
+<!-- AI对话模块 -->
+<div id="aiChatContainer">
+    <div id="chatBox"></div>
+    <div id="chatInput">
+        <textarea id="aiMessage" placeholder="输入消息..."></textarea>
+        <button id="sendAiBtn">发送</button>
+    </div>
+</div>
+
+<!-- 页脚 -->
+<footer class="footer">
+    <div class="text-center rights container">
+        <div class="col-md-offset-2 col-md-2"><span class="fa fa-thumbs-o-up"></span><p>品质保障</p></div>
+        <div class="col-md-2"><span class="fa fa-address-card-o"></span><p>私人订制</p></div>
+        <div class="col-md-2"><span class="fa fa-graduation-cap"></span><p>学生特供</p></div>
+        <div class="col-md-2"><span class="fa fa-bitcoin"></span><p>专属特权</p></div>
+    </div>
+    <div class="container beforeBottom">
+        <div class="col-md-offset-1 col-md-3">
+            <div><img src="../images/index/stumalllogo.png" class="footLogo" /></div>
+            <div><img src="../images/index/footerFont.png" /></div>
+        </div>
+        <div class="col-md-4 callus text-center">
+            <div class="col-md-4">
+                <ul>
+                    <li><a href="#"><p>买家帮助</p></a></li>
+                    <li><a href="#">新手指南</a></li>
+                    <li><a href="#">服务保障</a></li>
+                    <li><a href="#">常见问题</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <ul>
+                    <li><a href="#"><p>商家帮助</p></a></li>
+                    <li><a href="#">商家入驻</a></li>
+                    <li><a href="#">商家后台</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <ul>
+                    <li><a href="#"><p>关于我们</p></a></li>
+                    <li><a href="#">关于圆心</a></li>
+                    <li><a href="#">联系我们</a></li>
+                    <li><span class="fa fa-wechat"></span> <span class="fa fa-weibo"></span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="col-md-5">
+                <p>电脑商城客户端</p>
+                <img src="../images/index/ios.png" class="lf">
+                <img src="../images/index/android.png" class="lf" />
+            </div>
+            <div class="col-md-6">
+                <img src="../images/index/erweima.png">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12 text-center bottom">
+        Copyright © 2022 dnsc.cn All Rights Reserved 京ICP备08963888号-45
+        <a target="_blank" href="http://www.dnsc.cn/">圆心科技集团有限公司</a> 版权所有
+    </div>
+</footer>
+
+<script src="../bootstrap3/jquery-1.8.3.min.js"></script>
+<script src="../bootstrap3/js/bootstrap.js"></script>
+<script>
+    $(document).ready(function(){
+
+        function addMessage(content, type){
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+            const msgDom = $(`
+            <div class="message ${type}">
+                <span class="msg-text" style="white-space: pre-wrap;">${content}</span>
+                <span class="timestamp">${time}</span>
+            </div>
+        `);
+            $('#chatBox').append(msgDom);
+            $('#chatBox').scrollTop($('#chatBox')[0].scrollHeight);
+            return msgDom.find(".msg-text");
+        }
+
+        $("#sendAiBtn").click(function(){
+            const message = $("#aiMessage").val().trim();
+            if(!message) return;
+
+            addMessage(message, 'user'); // 用户消息
+            $("#aiMessage").val('');
+
+            const aiTextDom = addMessage("", 'ai'); // AI 空容器
+
+            // 使用 SSE 流式接收
+            const eventSource = new EventSource("/chat/stream?message=" + encodeURIComponent(message));
+
+            eventSource.onmessage = function(event){
+                if(event.data === "[DONE]"){
+                    eventSource.close();
+                    return;
+                }
+
+                // 流式追加内容，每次新行分段显示
+                let current = aiTextDom.html(); // 用 html 支持换行
+                let chunk = event.data
+                    .replace(/\n/g, '<br>')           // 换行
+                    .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>') // 加粗
+                    .replace(/\*(.+?)\*/g, '<i>$1</i>');    // 斜体
+                aiTextDom.html(current + chunk);
+
+                $('#chatBox').scrollTop($('#chatBox')[0].scrollHeight);
+            };
+
+            eventSource.onerror = function(){
+                eventSource.close();
+                aiTextDom.append('<br><span style="color:red;">消息接收失败</span>');
+            };
+        });
+
+        // 回车发送消息，Shift+Enter换行
+        $("#aiMessage").keydown(function(e){
+            if(e.key === "Enter" && !e.shiftKey){
+                e.preventDefault();
+                $("#sendAiBtn").click();
+            }
+        });
+
+    });
+
+
+</script>
+</body>
+</html>

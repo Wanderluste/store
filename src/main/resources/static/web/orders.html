@@ -280,9 +280,11 @@
 					//获取当前订单的oid
 					let oid = orderVo.oid;
 
+					let image = orderVo.image.trim().replace(/\s+/g, "");
+
 					if (JSON.parse(orderVo.oid) === lastOrderId){
 						orderTopStr =  "<tr>"
-								+ "<td><img src=.." + orderVo.image + "collect.png" + " class=\"img-responsive\" /></td>"
+								+ "<td><img src=.." + image + "collect.png" + " class=\"img-responsive\" /></td>"
 								+ "<td>" + orderVo.title + "</td>"
 								+ "<td>¥<span> " + orderVo.price + " </span></td>"
 								+ "<td>" + orderVo.num + "</td>"
@@ -318,7 +320,7 @@
 								+ "</thead>"
 								+ "<tbody id=tbody" + idNum + " class=\"orders-body\">"
 								+ "<tr>"
-								+ "<td><img src=.." + orderVo.image + "collect.png" + " class=\"img-responsive\" /></td>"
+								+ "<td><img src=.." + image + "collect.png" + " class=\"img-responsive\" /></td>"
 								+ "<td>" + orderVo.title + "</td>"
 								+ "<td>¥<span> " + orderVo.price + " </span></td>"
 								+ "<td>" + orderVo.num + "</td>"

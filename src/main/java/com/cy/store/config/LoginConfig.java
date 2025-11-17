@@ -27,7 +27,7 @@ public class LoginConfig implements WebMvcConfigurer {
                         "/css/**","/bootstrap3/**", "/images/**","/js/**")
                 //放行请求接口和支付宝沙箱接口
                 .excludePathPatterns("/users/**","/addresses/**","/file/**","/districts/**",
-                        "/products/**","/carts/**","/orders/**","/kaptcha/**",
+                        "/products/**","/carts/**","/orders/**","/kaptcha/**", "/chat/**",
                         "/alipay/**")
                 //不放行/error页面有可能导致白名单失效假象
                 .excludePathPatterns("/error");

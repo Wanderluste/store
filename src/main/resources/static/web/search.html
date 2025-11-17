@@ -320,10 +320,12 @@
 				//填充商品信息至页面
 				for (let i = 0; i < dataLength; i++) {
 					let product = res.data.list[i]
-					console.log(product.id)
+					let imagePath = product.image.trim(); // 去掉前后空格
+					imagePath = imagePath.replace(/\s+/g, ""); // 去掉中间空格
+					console.log(product.image)
 					productListStr = "<div class=\"col-md-3\">"
 							+ "<div class=\"goods-panel\">"
-							+ "<img src=.." + product.image + "collect.png" + "  class=\"img-responsive\" />"
+							+ "<img src=.." + imagePath+ "collect.png" + "  class=\"img-responsive\" />"
 							+ "<p>￥" + product.price  + ".00" + "</p>"
 							+ "<div class=\"text-row-3\">"
 							+ "<a href=product.html?pid=" + product.id
